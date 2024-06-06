@@ -55,6 +55,7 @@ def lemmatize_text(text, morph, en_stopwords):
             synonyms = get_synonyms(lemmatized_word, morph)
             lemmatized_text_with_synonyms.extend(synonyms)
     return ' '.join(lemmatized_text_with_synonyms)
+
 # Система обратной связи
 def update_rating(game_name, new_rating, data):
     if game_name in data['Name'].values:
@@ -95,7 +96,7 @@ def recommend():
     related_docs_indices = cosine_similarities.argsort()[-1:-6:-1]
     recommended_activities = data.iloc[related_docs_indices]
     recommended_activities_sorted = recommended_activities.sort_values(by='Rating', ascending=False)
-    recommended_activities_dict = recommended_activities_sorted[['Name', 'Instruction', 'Rating']].to_dict(orient='records')
+    recommended_activities_dict = recommended_activities_sorted[['Name', 'Instruction', 'Rating', 'Type', 'Active']].to_dict(orient='records')
     return jsonify(recommended_activities_dict)
 
 @app.route('/rate', methods=['POST'])
@@ -106,4 +107,4 @@ def rate():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

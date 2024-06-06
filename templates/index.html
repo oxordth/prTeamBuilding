@@ -35,6 +35,8 @@
                 activityDiv.classList.add('activity');
                 activityDiv.innerHTML = `<h2>${activity.Name}</h2>
                                           <p>Рейтинг: ${activity.Rating}</p>
+                                          <p>Тип мероприятия: ${activity.Type}</p>
+                                          <p>Степень активности: ${activity.}</p>
                                           <p>${activity.Instruction}</p>
                                           <label for="rating-${activity.Name}">Оцените эту игру:</label>
                                           <input type="number" id="rating-${activity.Name}" name="rating" min="1" max="5">
