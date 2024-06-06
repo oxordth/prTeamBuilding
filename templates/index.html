@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тимбилдинг</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Система рекомендаций активностей для тимбилдинга</h1>
+        <form id="description-form">
+            <textarea id="description" placeholder="Введите описание команды"></textarea>
+            <button type="submit">Подтвердить описание</button>
+        </form>
+        <div id="recommendations"></div>
+    </div>
+
+    <script>
+        document.getElementById('description-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const description = document.getElementById('description').value;
+            const response = await fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `description=${description}`
+            });
+            const recommendations = await response.json();
+            const recommendationsDiv = document.getElementById('recommendations');
+            recommendationsDiv.innerHTML = '';
+            recommendations.forEach(activity => {
+                const activityDiv = document.createElement('div');
+                activityDiv.classList.add('activity');
+                activityDiv.innerHTML = `<h2>${activity.Name}</h2>
+                                          <p>Рейтинг: ${activity.Rating}</p>
+                                          <p>${activity.Instruction}</p>
+                                          <label for="rating-${activity.Name}">Оцените эту игру:</label>
+                                          <input type="number" id="rating-${activity.Name}" name="rating" min="1" max="5">
+                                          <button onclick="rateActivity('${activity.Name}', ${activity.Rating})">Подтвердить оценку</button>`;
+                recommendationsDiv.appendChild(activityDiv);
+            });
+        });
+
+        async function rateActivity(gameName, currentRating) {
+            const ratingInput = document.getElementById(`rating-${gameName}`);
+            const newRating = ratingInput.value;
+            if (newRating < 1 || newRating > 5) {
+                alert("Введите цифру от 1 до 5");
+                return;
+            }
+
+            const response = await fetch('/rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `game_name=${gameName}&rating=${newRating}`
+            });
+            const result = await response.json();
+            if (result.status === "success") {
+                alert("Оценка добавлена!");
+                ratingInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
